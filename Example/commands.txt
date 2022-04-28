@@ -1,0 +1,23 @@
+./net.sh 
+./net.sh up
+
+ORG1:
+export FABRIC_CFG_PATH=$PWD/config/
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org1MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.wat.net/peers/peer0.org1.wat.net/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.wat.net/users/Admin@org1.wat.net/msp
+export CORE_PEER_ADDRESS=localhost:7051
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.wat.net --tls --cafile "${PWD}/organizations/ordererOrganizations/wat.net/orderers/orderer.wat.net/msp/tlscacerts/tlsca.wat.net-cert.pem" -C example -n Example --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.wat.net/peers/peer0.org1.wat.net/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.wat.net/peers/peer0.org2.wat.net/tls/ca.crt" -c '{"function":"RegisterParcel","Args":["Destination","Product_list","Consignor"]}'
+peer chaincode query -C example -n Example -c '{"function":"GetParcel","Args":["84fb68bcbed7bb51c72ad3e216a713569f69dad4c177d2ef12755d46fd1506fc"]}'
+
+
+ORG2:
+export CORE_PEER_LOCALMSPID="Org2MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.wat.net/peers/peer0.org2.wat.net/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.wat.net/users/Admin@org2.wat.net/msp
+export CORE_PEER_ADDRESS=localhost:9051
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.wat.net --tls --cafile "${PWD}/organizations/ordererOrganizations/wat.net/orderers/orderer.wat.net/msp/tlscacerts/tlsca.wat.net-cert.pem" -C example -n Example --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.wat.net/peers/peer0.org1.wat.net/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.wat.net/peers/peer0.org2.wat.net/tls/ca.crt" -c '{"function":"SortingO1","Args":["1907f7c5df5af74bc9f8068b0bf76c4d8761f75b1b350724b8024f61c4fe62d8"]}'
+peer chaincode query -C example -n Example -c '{"function":"GetParcel","Args":["1907f7c5df5af74bc9f8068b0bf76c4d8761f75b1b350724b8024f61c4fe62d8"]}'
